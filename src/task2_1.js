@@ -16,7 +16,7 @@ const outputObj = new Transform({
     }
 });
 
-pipeline(source, csv(), outputObj, target, (err) => {
+const startTask = () => pipeline(source, csv(), outputObj, target, (err) => {
     if (err) {
         console.error('An error occurred:', err);
         process.exitCode = 1;
@@ -24,3 +24,5 @@ pipeline(source, csv(), outputObj, target, (err) => {
         console.log('Pipeline succeeded.');
     }
 });
+
+export default startTask;

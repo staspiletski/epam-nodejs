@@ -1,3 +1,3 @@
-import startTask from "./task2";
+import startTask from "./task2_1";
 
 startTask();
