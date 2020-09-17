@@ -11,14 +11,8 @@ const userController = {
     }
   },
 
-  read(req: Request, res: Response): void {
-    const { substring, limit } = req.query;
-
-    if (!!substring) {
-      res.json(userService.readSuggested(substring.toString(), Number(limit)));
-    } else {
-      res.json(userService.readAll());
-    }
+  async read(req: Request, res: Response) {
+    await res.json(userService.readAll());
   },
 
   readUserById(req: Request, res: Response): void {

@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import UserModel from '../models/user';
 
 type User = {
   id: string;
@@ -18,12 +19,12 @@ const userService = {
     return newUser;
   },
 
-  readAll() {
-    const users = Array.from(db.values());
-    return users.filter(item => !item.isDeleted);
+  async readAll() {
+    const users = await UserModel.findAll({ where: { isDeleted: false } });
+    return users;
   },
 
-  readSuggested(substring: string, limit: number) {
+  /*  readSuggested(substring: string, limit: number) {
     const allUsers = userService.readAll();
     const filteredUsers = allUsers.filter(user => user.login.includes(substring));
     const sortedUsers = filteredUsers.sort((user1, user2) =>
@@ -31,7 +32,7 @@ const userService = {
     );
 
     return limit ? sortedUsers.slice(0, limit) : sortedUsers;
-  },
+  },*/
 
   readUserById(id: string) {
     return db.get(id);
@@ -55,6 +56,13 @@ const userService = {
 
     return user;
   },
+
+  /*  toUser({ external_id, is_deleted, ...rest }): User => ({
+    id: external_id,
+    isDeleted: is_deleted,
+    ...rest
+  });
+}*/
 };
 
 export default userService;
