@@ -1,8 +1,7 @@
-import { v4 as uuidv4 } from 'uuid';
 import UserModel from '../models/user';
 
 type User = {
-  id: string;
+  id?: string;
   login: string;
   password: string;
   age: number;
@@ -12,57 +11,41 @@ type User = {
 const db = new Map<string, User>();
 
 const userService = {
-  create(user: User): User {
-    const id = uuidv4();
-    const newUser = { ...user, id: id, isDeleted: false };
-    db.set(id, newUser);
+  async create(user: User) {
+    const { login, password, age, isDeleted } = user;
+    const newUser = await UserModel.create({
+      login: login,
+      password: password,
+      age: age,
+      isDeleted: isDeleted,
+    });
     return newUser;
   },
 
   async readAll() {
-    const users = await UserModel.findAll({ where: { isDeleted: false } });
-    return users;
+    return await UserModel.findAll({ where: { isDeleted: false } });
   },
 
-  /*  readSuggested(substring: string, limit: number) {
-    const allUsers = userService.readAll();
-    const filteredUsers = allUsers.filter(user => user.login.includes(substring));
-    const sortedUsers = filteredUsers.sort((user1, user2) =>
-      user1.login.localeCompare(user2.login),
+  async readUserById(id: string) {
+    return await UserModel.findByPk(id);
+  },
+
+  // example : { "login": "lll123AAA", "password": "123xzcxAAAcsd","age": 50,"isDeleted": false }
+  async update(id: string, user: User) {
+    const { login, password, age, isDeleted } = user;
+    return await UserModel.update(
+      { login: login, password: password, age: age, isDeleted: isDeleted },
+      { where: { id: id } },
     );
-
-    return limit ? sortedUsers.slice(0, limit) : sortedUsers;
-  },*/
-
-  readUserById(id: string) {
-    return db.get(id);
   },
 
-  update(id: string, user: User): User | null {
-    if (db.has(id)) {
-      const currUser = db.get(id);
-      db.set(id, { ...currUser, ...user });
-      return user;
+  async delete(id: string) {
+    const deletedUser = await UserModel.findByPk(id);
+    if (!deletedUser) {
+      return null;
     }
-
-    return null;
+    return await deletedUser.update({ isDeleted: true });
   },
-
-  delete(id: string): User | undefined {
-    const user = db.get(id);
-    if (user) {
-      user.isDeleted = true;
-    }
-
-    return user;
-  },
-
-  /*  toUser({ external_id, is_deleted, ...rest }): User => ({
-    id: external_id,
-    isDeleted: is_deleted,
-    ...rest
-  });
-}*/
 };
 
 export default userService;

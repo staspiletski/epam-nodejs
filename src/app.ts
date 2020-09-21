@@ -8,24 +8,24 @@ import { INIT_DATA } from '../assets/data/initData';
 dotenv.config();
 
 const app: express.Application = express();
-
+app.use(express.json());
 app.use(userRouter);
 
 sequelize
   .authenticate()
   .then(() => {
-    console.log('@@@ Connection has been established successfully.');
+    console.log('Connection has been established successfully.');
   })
   .catch(err => {
-    console.error('@@@ Unable to connect to the database:', err);
+    console.error('Unable to connect to the database:', err);
   });
 
 sequelize.sync({ force: true }).then(() => {
-  UserModel.bulkCreate(INIT_DATA, { returning: true, validate: true }).then(r =>
-    console.log('@@@ ', r),
+  UserModel.bulkCreate(INIT_DATA, { validate: true }).then(r =>
+    console.log('Successfully created init data.'),
   );
 
-  app.listen(process.env.PORT, () => {
+  app.listen(process.env.PORT || 4500, () => {
     console.log(`Listening at http://localhost:${process.env.PORT}`);
   });
 });

@@ -10,18 +10,4 @@ const sequelize = new Sequelize(
   },
 );
 
-/*const db: any = {
-  Users: sequelize.import('../models/user'),
-};
-/!*
-
-/!*Object.keys(models).forEach(key => {
-  if ('associate' in models[key]) {
-    models[key].associate(models);
-  }
-});*!/
-
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;*/
-
 export default sequelize;

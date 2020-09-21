@@ -2,7 +2,7 @@ import { DataTypes, Model, UUIDV4 } from 'sequelize';
 import sequelize from '../data-access/dataAccess';
 
 interface UserInstance extends Model {
-  id: number;
+  id?: number;
   login: string;
   password: string;
   age: number;
