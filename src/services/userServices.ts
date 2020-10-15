@@ -8,18 +8,15 @@ type User = {
   isDeleted?: boolean | false;
 };
 
-const db = new Map<string, User>();
-
 const userService = {
   async create(user: User) {
     const { login, password, age, isDeleted } = user;
-    const newUser = await UserModel.create({
+    return await UserModel.create({
       login: login,
       password: password,
       age: age,
       isDeleted: isDeleted,
     });
-    return newUser;
   },
 
   async readAll() {
@@ -44,7 +41,7 @@ const userService = {
     if (!deletedUser) {
       return null;
     }
-    return await deletedUser.update({ isDeleted: true });
+    return await deletedUser.destroy();
   },
 };
 

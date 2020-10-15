@@ -1,7 +1,7 @@
 import { DataTypes, Model, UUIDV4 } from 'sequelize';
 import sequelize from '../data-access/dataAccess';
 
-interface UserInstance extends Model {
+export interface UserInstance extends Model {
   id?: number;
   login: string;
   password: string;
@@ -10,7 +10,7 @@ interface UserInstance extends Model {
 }
 
 const UserModel = sequelize.define<UserInstance>(
-  'users',
+  'user',
   {
     id: {
       type: DataTypes.UUID,
@@ -38,7 +38,7 @@ const UserModel = sequelize.define<UserInstance>(
     },
   },
   {
-    tableName: 'users',
+    timestamps: false,
   },
 );
 

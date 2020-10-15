@@ -1,4 +1,4 @@
-export const INIT_DATA = [
+export const INIT_USER_DATA = [
   {
     login: 'user name 1',
     password: 'password 1',
@@ -25,3 +25,5 @@ export const INIT_DATA = [
     age: 55,
   },
 ];
+
+export const PERMISSIONS = ['READ', 'WRITE', 'DELETE', 'SHARE', 'UPLOAD_FILES'];

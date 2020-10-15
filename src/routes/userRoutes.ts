@@ -4,7 +4,7 @@ import {
   limitValidationSchema,
   loginSubstringValidationSchema,
   userValidationSchema,
-} from '../validation/schemas/useSchema';
+} from '../validation/schemas/userSchema';
 import { validateRequest } from '../validation/userValidation';
 
 const router: Router = Router();
@@ -30,7 +30,7 @@ router.get('/user/:id', (req: Request, res: Response) => {
 // create user
 router.post('/user', validateRequest(userValidationSchema), userController.create);
 
-//update user
+// update user
 router.put('/user/:id', validateRequest(userValidationSchema), userController.update);
 
 // delete user
