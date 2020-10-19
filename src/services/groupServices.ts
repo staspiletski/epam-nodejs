@@ -8,11 +8,15 @@ type Group = {
 
 const groupService = {
   async create(group: Group) {
-    const { name, permissions } = group;
-    return await GroupModel.create({
-      name: name,
-      permissions: permissions,
-    });
+    try {
+      const { name, permissions } = group;
+      return await GroupModel.create({
+        name: name,
+        permissions: permissions,
+      });
+    } catch (error) {
+      console.error(error);
+    }
   },
 
   async readAll() {

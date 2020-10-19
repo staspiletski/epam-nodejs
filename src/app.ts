@@ -5,7 +5,6 @@ import sequelize from './data-access/dataAccess';
 import UserModel from './models/user';
 import { INIT_USER_DATA } from '../assets/data/initData';
 import { groupRouter } from './routes/groupRoutes';
-import GroupModel from './models/group';
 import { userGroupRouter } from './routes/userGroupRoutes';
 
 dotenv.config();
@@ -24,10 +23,12 @@ sequelize
     console.error('Unable to connect to the database:', err);
   });
 
-sequelize.sync({ force: false }).then(() => {
-  UserModel.bulkCreate(INIT_USER_DATA, { validate: true }).then(r =>
-    console.log('Successfully created user data.'),
-  );
+sequelize.sync().then(() => {
+  UserModel.bulkCreate(INIT_USER_DATA, { validate: true, ignoreDuplicates: true })
+    .then(() => console.log('Successfully created user data.'))
+    .catch(err => {
+      console.error('Bulk creation error: ', err);
+    });
 
   app.listen(process.env.PORT || 4500, () => {
     console.log(`Listening at http://localhost:${process.env.PORT}`);

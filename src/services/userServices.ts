@@ -10,13 +10,17 @@ type User = {
 
 const userService = {
   async create(user: User) {
-    const { login, password, age, isDeleted } = user;
-    return await UserModel.create({
-      login: login,
-      password: password,
-      age: age,
-      isDeleted: isDeleted,
-    });
+    try {
+      const { login, password, age, isDeleted } = user;
+      return await UserModel.create({
+        login: login,
+        password: password,
+        age: age,
+        isDeleted: isDeleted,
+      });
+    } catch (error) {
+      console.error(error);
+    }
   },
 
   async readAll() {
