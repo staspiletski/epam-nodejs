@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import groupService from '../services/groupServices';
+import { logger } from "../logger/logger";
+import { loggerFormat } from "../logger/utils";
 
 const groupController = {
   async create(req: Request, res: Response) {
@@ -8,7 +10,7 @@ const groupController = {
       const group = await groupService.create({ name, permissions });
       res.status(201).json(group);
     } catch (error) {
-      console.error(error);
+      logger.error(loggerFormat(req, res), {message: error, methodName: 'groupController.create'});
       res.status(404).json(error.message);
     }
   },
@@ -18,7 +20,7 @@ const groupController = {
       const groups = await groupService.readAll();
       res.status(200).json(groups);
     } catch (error) {
-      console.error(error);
+      logger.error(loggerFormat(req, res), {message: error, methodName: 'groupController.read'});
       res.status(404).json(error.message);
     }
   },
@@ -30,7 +32,7 @@ const groupController = {
 
       group ? res.json(group) : res.sendStatus(404);
     } catch (error) {
-      console.error(error);
+      logger.error(loggerFormat(req, res), {message: error, methodName: 'groupController.readGroupById'});
       res.status(404).json(error.message);
     }
   },
@@ -44,9 +46,9 @@ const groupController = {
         res.status(204);
         res.json(group);
       }
-    } catch {
-      res.status(404);
-      res.json({ message: 'Group not fond' });
+    } catch (error) {
+      logger.error(loggerFormat(req, res), {message: error, methodName: 'groupController.update'});
+      res.status(404).json({ message: 'Group not fond' });
     }
   },
 
@@ -55,9 +57,9 @@ const groupController = {
       const id = req.params['id'];
       const group = groupService.delete(id);
       res.json(group);
-    } catch {
-      res.status(404);
-      res.json({ message: 'Group not fond' });
+    } catch (error) {
+      logger.error(loggerFormat(req, res), {message: error, methodName: 'groupController.delete'});
+      res.status(404).json({ message: 'Group not fond' });
     }
   },
 };

@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import * as dotenv from 'dotenv';
 import { userRouter } from './routes/userRoutes';
 import sequelize from './data-access/dataAccess';
@@ -6,13 +6,35 @@ import UserModel from './models/user';
 import { INIT_USER_DATA } from '../assets/data/initData';
 import { groupRouter } from './routes/groupRoutes';
 import { userGroupRouter } from './routes/userGroupRoutes';
+import { logger } from './logger/logger';
+import { errorRouter } from './routes/errorRoutes';
+import { loggerFormat } from "./logger/utils";
 
 dotenv.config();
 
 const app: express.Application = express();
 app.use(express.json());
 
-app.use(userRouter, groupRouter, userGroupRouter);
+app.use((req: Request, res: Response, next: NextFunction) => {
+  logger.info(loggerFormat(req, res));
+  next();
+});
+
+app.use(userRouter, groupRouter, userGroupRouter, errorRouter);
+
+app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+  logger.error(`Internal Server Error: ${error}`);
+  res.status(500).send('Internal Server Error');
+});
+
+process
+  .on('uncaughtException', (error: Error) => {
+    logger.error(`Uncaught Exception: ${error}`);
+  })
+
+  .on('unhandledRejection', (error: Error, promise: Promise<any>) => {
+    logger.error(`Unhandled Rejection: ${error} ${promise} `);
+  });
 
 sequelize
   .authenticate()
