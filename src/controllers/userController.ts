@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import userService from '../services/userServices';
+import { logger } from "../logger/logger";
+import { loggerFormat } from "../logger/utils";
 
 const userController = {
   async create(req: Request, res: Response) {
@@ -8,7 +10,7 @@ const userController = {
       const user = await userService.create({ login, password, age, isDeleted });
       res.status(201).json(user);
     } catch (error) {
-      console.error(error);
+      logger.error(loggerFormat(req, res), {message: error, methodName: 'userController.create'});
       res.status(404).json(error.message);
     }
   },
@@ -18,7 +20,7 @@ const userController = {
       const users = await userService.readAll();
       res.status(200).json(users);
     } catch (error) {
-      console.error(error);
+      logger.error(loggerFormat(req, res), {message: error, methodName: 'userController.read'});
       res.status(404).json(error.message);
     }
   },
@@ -30,7 +32,7 @@ const userController = {
 
       user ? res.json(user) : res.sendStatus(404);
     } catch (error) {
-      console.error(error);
+      logger.error(loggerFormat(req, res), {message: error, methodName: 'userController.readUserById'});
       res.status(404).json(error.message);
     }
   },
@@ -44,9 +46,9 @@ const userController = {
         res.status(204);
         res.json(user);
       }
-    } catch {
-      res.status(404);
-      res.json({ message: 'User not fond' });
+    } catch (error) {
+      logger.error(loggerFormat(req, res), {message: error, methodName: 'userController.update'});
+      res.status(404).json({ message: 'User not fond' });
     }
   },
 
@@ -55,9 +57,9 @@ const userController = {
       const id = req.params['id'];
       const user = userService.delete(id);
       res.json(user);
-    } catch {
-      res.status(404);
-      res.json({ message: 'User not fond' });
+    } catch (error) {
+      logger.error(loggerFormat(req, res), {message: error, methodName: 'userController.delete'});
+      res.status(404).json({ message: 'User not fond' });
     }
   },
 };
