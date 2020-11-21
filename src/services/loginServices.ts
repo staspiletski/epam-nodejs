@@ -3,6 +3,7 @@ import UserModel from '../models/user';
 import jwt from 'jsonwebtoken';
 import { NextFunction, Request, Response } from 'express';
 import getLocalStore from '../storage/localStorage';
+import { SECRET_KEY } from '../config';
 
 const localStore = getLocalStore();
 
@@ -15,8 +16,8 @@ const loginServices = {
       if (dataValues) {
         // @ts-ignore
         let payload = { sub: dataValues.id, isDeleted: dataValues.isDeleted };
-        let token = jwt.sign(payload, 'secret-string', { expiresIn: 1800 });
-        console.log(' generated token ', token);
+        // @ts-ignore
+        let token = jwt.sign(payload, SECRET_KEY, { expiresIn: 1800 });
         localStore.set('token', token);
         localStore.save();
         return token;
@@ -38,9 +39,10 @@ const loginServices = {
     }
 
     const token = req.headers['authorization'] as string;
-
+    console.log(' isAuthenticated ', req.headers['authorization']);
     if (token) {
-      jwt.verify(token, 'secret-string', (err, decoded) => {
+      // @ts-ignore
+      jwt.verify(token, SECRET_KEY, (err, decoded) => {
         if (err) {
           logger.error('isAuthenticated err: ', err);
           return res.status(403).send({ success: false, message: 'Invalid JWT token' });

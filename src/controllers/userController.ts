@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import userService from '../services/userServices';
-import { logger } from "../logger/logger";
-import { loggerFormat } from "../logger/utils";
+import { logger } from '../logger/logger';
+import { loggerFormat } from '../logger/utils';
 
 const userController = {
   async create(req: Request, res: Response) {
@@ -10,7 +10,7 @@ const userController = {
       const user = await userService.create({ login, password, age, isDeleted });
       res.status(201).json(user);
     } catch (error) {
-      logger.error(loggerFormat(req, res), {message: error, methodName: 'userController.create'});
+      logger.error(loggerFormat(req, res), { message: error, methodName: 'userController.create' });
       res.status(404).json(error.message);
     }
   },
@@ -18,9 +18,10 @@ const userController = {
   async read(req: Request, res: Response) {
     try {
       const users = await userService.readAll();
+      console.log(' User Controller req headers ', req.headers['authorization']);
       res.status(200).json(users);
     } catch (error) {
-      logger.error(loggerFormat(req, res), {message: error, methodName: 'userController.read'});
+      logger.error(loggerFormat(req, res), { message: error, methodName: 'userController.read' });
       res.status(404).json(error.message);
     }
   },
@@ -32,7 +33,10 @@ const userController = {
 
       user ? res.json(user) : res.sendStatus(404);
     } catch (error) {
-      logger.error(loggerFormat(req, res), {message: error, methodName: 'userController.readUserById'});
+      logger.error(loggerFormat(req, res), {
+        message: error,
+        methodName: 'userController.readUserById',
+      });
       res.status(404).json(error.message);
     }
   },
@@ -47,7 +51,7 @@ const userController = {
         res.json(user);
       }
     } catch (error) {
-      logger.error(loggerFormat(req, res), {message: error, methodName: 'userController.update'});
+      logger.error(loggerFormat(req, res), { message: error, methodName: 'userController.update' });
       res.status(404).json({ message: 'User not fond' });
     }
   },
@@ -58,7 +62,7 @@ const userController = {
       const user = userService.delete(id);
       res.json(user);
     } catch (error) {
-      logger.error(loggerFormat(req, res), {message: error, methodName: 'userController.delete'});
+      logger.error(loggerFormat(req, res), { message: error, methodName: 'userController.delete' });
       res.status(404).json({ message: 'User not fond' });
     }
   },
