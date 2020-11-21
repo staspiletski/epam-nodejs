@@ -1,5 +1,4 @@
 import express, { Request, Response, NextFunction } from 'express';
-import * as dotenv from 'dotenv';
 import { userRouter } from './routes/userRoutes';
 import sequelize from './data-access/dataAccess';
 import UserModel from './models/user';
@@ -13,10 +12,10 @@ import cors from 'cors';
 import { loginRouter } from './routes/loginRouter';
 import loginServices from './services/loginServices';
 import getLocalStore from './storage/localStorage';
+import { getConfig, PORT } from './config';
 
 const localStore = getLocalStore();
-
-dotenv.config();
+getConfig();
 
 const app: express.Application = express();
 
@@ -70,7 +69,7 @@ sequelize.sync().then(() => {
       console.error('Bulk creation error: ', err);
     });
 
-  app.listen(process.env.PORT || 4500, () => {
-    console.log(`Listening at http://localhost:${process.env.PORT}`);
+  app.listen(PORT || 4545, () => {
+    console.log(`Listening at http://localhost:${PORT}`);
   });
 });
