@@ -17,7 +17,7 @@ import { getConfig, PORT } from './config';
 const localStore = getLocalStore();
 getConfig();
 
-const app: express.Application = express();
+export const app: express.Application = express();
 
 const corsOptions = {
   origin: ['http://localhost:4500', 'http://g1.com'],

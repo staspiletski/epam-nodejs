@@ -1,40 +1,88 @@
-import { mockRequest, mockResponse } from './mock';
-import { describe, expect, test } from '@jest/globals';
-import userController from '../controllers/userController';
+import express from 'express';
+import request from 'supertest';
+import { userRouter } from '../routes/userRoutes';
 
-/*
-res.status = jest.fn(() => res);
-res.json = jest.fn(() => res);
-*/
+const app = express().use(express.json()).use(userRouter);
 
-describe('userController', () => {
-  test('should 201 and return correct value', async () => {
-    let req = mockRequest();
-    const user = {
-      id: 12345,
-      login: 'login',
-      password: 'password',
-      age: 55,
-      isDeleted: false,
-    };
-
-    const res = mockResponse();
-
-    await userController.create(req, res);
-
-    expect(res.send).toHaveBeenCalledTimes(1);
-    expect(res.status).toHaveBeenCalledWith(201);
-    expect(res.json).toHaveBeenCalledWith(user);
+describe('UserController', () => {
+  it('GET /user', done => {
+    request(app)
+      .get('/user')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then(response => {
+        expect(response.body).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              login: 'user name 1',
+            }),
+          ]),
+        );
+        done();
+      });
   });
 
-  /*  test('should 404 and return correct value', async () => {
-    let req = mockRequest();
-    req.params.id = null;
-    const res = mockResponse();
+  it('GET /user/:id', done => {
+    request(app)
+      .get('/user/9cc90bfb-3552-47b9-86a9-4a2be7954f60')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then(response => {
+        expect(response.body).toEqual({
+          age: 15,
+          id: '9cc90bfb-3552-47b9-86a9-4a2be7954f60',
+          isDeleted: false,
+          login: 'user name 1',
+          password: 'passWORD 1',
+        });
+        done();
+      });
+  });
 
-    await controller.todoController(req, res);
+  it('GET /user/:id', done => {
+    request(app)
+      .get('/user/9cc90bfb-5555-47b9-86a9-4a2be7954f60')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(404, '"User not found"')
+      .end(err => {
+        if (err) done(err);
+        done();
+      });
+  });
 
-    expect(res.status).toHaveBeenCalledWith(404);
-    expect(res.json).toHaveBeenCalledWith({ message: 'Not Found' });
-  });*/
+  let data = {
+    login: 'login name 1',
+    password: 'password 12345',
+    age: 35,
+    isDeleted: false,
+  };
+
+  it('POST /user', done => {
+    request(app)
+      .post('/user')
+      .set('Accept', 'application/json')
+      /* .send(data)
+      .expect('Content-Type', /json/)
+      .expect(201)*/
+      .end((err, res) => {
+        if (err) {
+          console.log('error --- ', err);
+          done(err);
+        } else {
+          console.log(' res --- ', res);
+          expect(res.body).toEqual({
+            ...data,
+          });
+          done();
+        }
+      });
+
+    /*   .then(response => {
+        expect(response.body).toEqual({
+          ...data,
+        });
+        done();
+      });*/
+  });
 });

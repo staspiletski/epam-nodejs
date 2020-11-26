@@ -6,7 +6,9 @@ import { loggerFormat } from '../logger/utils';
 const userController = {
   async create(req: Request, res: Response) {
     try {
+      console.log(' CREATE 1 ', req.body);
       const { login, password, age, isDeleted } = req.body;
+      console.log(' CREATE 2 ', req.body);
       const user = await userService.create({ login, password, age, isDeleted });
       res.status(201).json(user);
     } catch (error) {
@@ -18,7 +20,6 @@ const userController = {
   async read(req: Request, res: Response) {
     try {
       const users = await userService.readAll();
-      console.log(' User Controller req headers ', req.headers['authorization']);
       res.status(200).json(users);
     } catch (error) {
       logger.error(loggerFormat(req, res), { message: error, methodName: 'userController.read' });
@@ -30,8 +31,7 @@ const userController = {
     try {
       const id = req.params['id'];
       const user = await userService.readUserById(id);
-
-      user ? res.json(user) : res.sendStatus(404);
+      user ? res.status(200).json(user) : res.status(404).json('User not found');
     } catch (error) {
       logger.error(loggerFormat(req, res), {
         message: error,
