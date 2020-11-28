@@ -5,16 +5,7 @@ import userService from '../services/userServices';
 import Mock = jest.Mock;
 
 jest.mock('../services/userServices');
-/*, () => ({
-  userService: {
-    readAll: jest.fn(),
-    updateUser: jest.fn(),
-    getUserById: jest.fn(),
-    getAutoSuggestUsers: jest.fn(),
-    markUserDeleted: jest.fn()
-  }
-}));
-*/
+
 const app = express().use(express.json()).use(userRouter);
 
 const data = {
@@ -25,27 +16,20 @@ const data = {
 };
 
 describe('UserController', () => {
-  (userService.readAll as Mock).mockResolvedValue([
-    { id: '123', login: 'login1', password: 'TestPassword123', age: 54 }
-  ]);
+  test('GET /user', done => {
+    (userService.readAll as Mock).mockResolvedValue([data]);
 
-  it('GET /user', done => {
-    request(app)
-      .get('/user')
-      .expect('Content-Type', /json/)
-      .expect(200)
-      .then(response => {
-        expect(response.body).toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({
-              login: 'user name 1',
-            }),
-          ]),
-        );
-        done();
-      });
+    request(app).get('/user').expect('Content-Type', /json/).expect(200).expect([data], done);
   });
 
+  /*.then(response => {
+  expect(response.body).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        login: 'user name 1',
+      }),
+    ]),
+  );*/
   it('GET /user/:id', done => {
     request(app)
       .get('/user/9cc90bfb-3552-47b9-86a9-4a2be7954f60')
@@ -84,9 +68,9 @@ describe('UserController', () => {
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(201)
-      .end((err) => {
+      .end(err => {
         if (err) return done(err);
-          done();
+        done();
       });
 
     /*   .then(response => {
