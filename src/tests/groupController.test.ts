@@ -7,6 +7,34 @@ jest.mock('../services/groupServices');
 
 const app = express().use(express.json()).use(groupRouter);
 
+/*[
+  {
+    id: "83f1e31b-3ce5-42d1-bde2-221145e31174",
+    name: "ADMIN",
+    permissions: [
+      "READ",
+      "WRITE",
+      "DELETE",
+      "SHARE",
+      "UPLOAD_FILES"
+    ]
+  },
+  {
+    id: "2d6cb973-fdcb-4b02-8aa2-2d7e0028fcfb",
+    name: "WRITER",
+    permissions: [
+      "WRITE"
+    ]
+  },
+  {
+    id: "a0888974-a50d-4f94-880f-d0dba4259452",
+    name: "READER",
+    permissions: [
+      "READ"
+    ]
+  }
+]*/
+
 const data = {
   id: '12345',
   login: 'loginName',
