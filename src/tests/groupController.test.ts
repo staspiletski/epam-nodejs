@@ -1,11 +1,11 @@
 import express from 'express';
 import request from 'supertest';
-import { userRouter } from '../routes/userRoutes';
-import userService from '../services/userServices';
+import { groupRouter } from '../routes/groupRoutes';
+import userService from '../services/groupServices';
 
-jest.mock('../services/userServices');
+jest.mock('../services/groupServices');
 
-const app = express().use(express.json()).use(userRouter);
+const app = express().use(express.json()).use(groupRouter);
 
 const data = {
   id: '12345',
