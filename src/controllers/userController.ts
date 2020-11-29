@@ -46,21 +46,18 @@ const userController = {
       const id = req.params['id'];
       const { login, password, age, isDeleted } = req.body;
       const user = await userService.update(id, { login, password, age, isDeleted });
-      if (user !== null) {
-        res.status(204);
-        res.json(user);
-      }
+      user ? res.status(200).json(user) : res.status(404).json('User not found');
     } catch (error) {
       logger.error(loggerFormat(req, res), { message: error, methodName: 'userController.update' });
       res.status(404).json({ message: 'User not fond' });
     }
   },
 
-  delete(req: Request, res: Response): void {
+  async delete(req: Request, res: Response) {
     try {
       const id = req.params['id'];
-      const user = userService.delete(id);
-      res.json(user);
+      const user = await userService.delete(id);
+      res.status(200).json(user);
     } catch (error) {
       logger.error(loggerFormat(req, res), { message: error, methodName: 'userController.delete' });
       res.status(404).json({ message: 'User not fond' });

@@ -11,9 +11,9 @@ export const validateRequest = (schema: Schema, queryParam: string = ''): Reques
     allowUnknown: true,
   });
 
+  console.log(' ERROR ', error);
   if (error) {
-    res.status(400);
-    next(`Validation error: ${error}`);
+    res.status(400).json(`Validation error: ${error}`);
   } else {
     next();
   }
