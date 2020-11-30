@@ -1,14 +1,36 @@
 import express from 'express';
 import * as dotenv from 'dotenv';
 import { userRouter } from './routes/userRoutes';
+import sequelize from './data-access/dataAccess';
+import UserModel from './models/user';
+import { INIT_USER_DATA } from '../assets/data/initData';
+import { groupRouter } from './routes/groupRoutes';
+import { userGroupRouter } from './routes/userGroupRoutes';
 
 dotenv.config();
 
 const app: express.Application = express();
-
 app.use(express.json());
-app.use(userRouter);
 
-app.listen(process.env.PORT, () => {
-  console.log(`Listening at http://localhost:${process.env.PORT}`);
+app.use(userRouter, groupRouter, userGroupRouter);
+
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log('Connection has been established successfully.');
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
+  });
+
+sequelize.sync().then(() => {
+  UserModel.bulkCreate(INIT_USER_DATA, { validate: true, ignoreDuplicates: true })
+    .then(() => console.log('Successfully created user data.'))
+    .catch(err => {
+      console.error('Bulk creation error: ', err);
+    });
+
+  app.listen(process.env.PORT || 4500, () => {
+    console.log(`Listening at http://localhost:${process.env.PORT}`);
+  });
 });

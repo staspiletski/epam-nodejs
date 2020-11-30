@@ -1,59 +1,51 @@
-import { v4 as uuidv4 } from 'uuid';
+import UserModel from '../models/user';
 
 type User = {
-  id: string;
+  id?: string;
   login: string;
   password: string;
   age: number;
   isDeleted?: boolean | false;
 };
 
-const db = new Map<string, User>();
-
 const userService = {
-  create(user: User): User {
-    const id = uuidv4();
-    const newUser = { ...user, id: id, isDeleted: false };
-    db.set(id, newUser);
-    return newUser;
+  async create(user: User) {
+    try {
+      const { login, password, age, isDeleted } = user;
+      return await UserModel.create({
+        login: login,
+        password: password,
+        age: age,
+        isDeleted: isDeleted,
+      });
+    } catch (error) {
+      console.error(error);
+    }
   },
 
-  readAll() {
-    const users = Array.from(db.values());
-    return users.filter(item => !item.isDeleted);
+  async readAll() {
+    return await UserModel.findAll({ where: { isDeleted: false } });
   },
 
-  readSuggested(substring: string, limit: number) {
-    const allUsers = userService.readAll();
-    const filteredUsers = allUsers.filter(user => user.login.includes(substring));
-    const sortedUsers = filteredUsers.sort((user1, user2) =>
-      user1.login.localeCompare(user2.login),
+  async readUserById(id: string) {
+    return await UserModel.findByPk(id);
+  },
+
+  // example : { "login": "lll123AAA", "password": "123xzcxAAAcsd","age": 50,"isDeleted": false }
+  async update(id: string, user: User) {
+    const { login, password, age, isDeleted } = user;
+    return await UserModel.update(
+      { login: login, password: password, age: age, isDeleted: isDeleted },
+      { where: { id: id } },
     );
-
-    return limit ? sortedUsers.slice(0, limit) : sortedUsers;
   },
 
-  readUserById(id: string) {
-    return db.get(id);
-  },
-
-  update(id: string, user: User): User | null {
-    if (db.has(id)) {
-      const currUser = db.get(id);
-      db.set(id, { ...currUser, ...user });
-      return user;
+  async delete(id: string) {
+    const deletedUser = await UserModel.findByPk(id);
+    if (!deletedUser) {
+      return null;
     }
-
-    return null;
-  },
-
-  delete(id: string): User | undefined {
-    const user = db.get(id);
-    if (user) {
-      user.isDeleted = true;
-    }
-
-    return user;
+    return await deletedUser.destroy();
   },
 };
 
