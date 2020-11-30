@@ -1,18 +1,57 @@
-import express from 'express';
-import * as dotenv from 'dotenv';
+import express, { Request, Response, NextFunction } from 'express';
 import { userRouter } from './routes/userRoutes';
 import sequelize from './data-access/dataAccess';
 import UserModel from './models/user';
 import { INIT_USER_DATA } from '../assets/data/initData';
 import { groupRouter } from './routes/groupRoutes';
 import { userGroupRouter } from './routes/userGroupRoutes';
+import { logger } from './logger/logger';
+import { errorRouter } from './routes/errorRoutes';
+import { loggerFormat } from './logger/utils';
+import cors from 'cors';
+import { loginRouter } from './routes/loginRouter';
+import loginServices from './services/loginServices';
+import getLocalStore from './storage/localStorage';
+import { getConfig, PORT } from './config';
 
-dotenv.config();
+const localStore = getLocalStore();
+getConfig();
 
 const app: express.Application = express();
+
+const corsOptions = {
+  origin: ['http://localhost:4500', 'http://g1.com'],
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  logger.info(loggerFormat(req, res));
+  next();
+});
+
 app.use(express.json());
 
-app.use(userRouter, groupRouter, userGroupRouter);
+app.use((req: Request, res: Response, next: NextFunction) => {
+  req.headers['authorization'] = localStore.get('token');
+  loginServices.isAuthenticated(req, res, next);
+});
+
+app.use(loginRouter, userRouter, groupRouter, userGroupRouter, errorRouter);
+
+app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+  logger.error(`Internal Server Error: ${error}`);
+  res.status(500).send('Internal Server Error');
+});
+
+process
+  .on('uncaughtException', (error: Error) => {
+    logger.error(`Uncaught Exception: ${error}`);
+  })
+
+  .on('unhandledRejection', (error: Error, promise: Promise<any>) => {
+    logger.error(`Unhandled Rejection: ${error} ${promise} `);
+  });
 
 sequelize
   .authenticate()
@@ -30,7 +69,7 @@ sequelize.sync().then(() => {
       console.error('Bulk creation error: ', err);
     });
 
-  app.listen(process.env.PORT || 4500, () => {
-    console.log(`Listening at http://localhost:${process.env.PORT}`);
+  app.listen(PORT || 4545, () => {
+    console.log(`Listening at http://localhost:${PORT}`);
   });
 });

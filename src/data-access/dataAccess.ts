@@ -1,13 +1,8 @@
 import { Sequelize } from 'sequelize';
-import * as dotenv from 'dotenv';
+import { DATABASE_URL } from '../config';
 
-dotenv.config();
-
-const sequelize = new Sequelize(
-  'postgres://ddbypwqh:hqLwBXP9L9gF9Sfkf5pOZQ2CpQ0eFUr5@lallah.db.elephantsql.com:5432/ddbypwqh',
-  {
-    dialect: 'postgres',
-  },
-);
+const sequelize = new Sequelize(DATABASE_URL as string, {
+  dialect: 'postgres',
+});
 
 export default sequelize;
