@@ -6,9 +6,7 @@ import { loggerFormat } from '../logger/utils';
 const userController = {
   async create(req: Request, res: Response) {
     try {
-      console.log(' CREATE 1 ', req.body);
       const { login, password, age, isDeleted } = req.body;
-      console.log(' CREATE 2 ', req.body);
       const user = await userService.create({ login, password, age, isDeleted });
       res.status(201).json(user);
     } catch (error) {
