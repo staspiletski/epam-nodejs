@@ -1,109 +1,68 @@
 import express from 'express';
 import request from 'supertest';
 import { groupRouter } from '../routes/groupRoutes';
-import userService from '../services/groupServices';
+import groupService from '../services/groupServices';
 
 jest.mock('../services/groupServices');
 
 const app = express().use(express.json()).use(groupRouter);
 
-/*[
-  {
-    id: "83f1e31b-3ce5-42d1-bde2-221145e31174",
-    name: "ADMIN",
-    permissions: [
-      "READ",
-      "WRITE",
-      "DELETE",
-      "SHARE",
-      "UPLOAD_FILES"
-    ]
-  },
-  {
-    id: "2d6cb973-fdcb-4b02-8aa2-2d7e0028fcfb",
-    name: "WRITER",
-    permissions: [
-      "WRITE"
-    ]
-  },
-  {
-    id: "a0888974-a50d-4f94-880f-d0dba4259452",
-    name: "READER",
-    permissions: [
-      "READ"
-    ]
-  }
-]*/
-
 const data = {
-  id: '12345',
-  login: 'loginName',
-  password: 'Password 12345',
-  age: 35,
-  isDeleted: false,
+  name: 'ADMIN',
+  permissions: ['READ', 'WRITE', 'DELETE', 'SHARE', 'UPLOAD_FILES'],
 };
 
-describe('UserController', () => {
-  test('GET /user', async () => {
-    (userService.readAll as any).mockResolvedValue([data]);
-    await request(app)
-      .get('/user')
-      .expect('Content-Type', /json/)
-      .expect(200,[data])
+describe('GroupController', () => {
+  test('GET /group', async () => {
+    (groupService.readAll as any).mockResolvedValue([data]);
+    await request(app).get('/group').expect('Content-Type', /json/).expect(200, [data]);
   });
 
-  test('GET /user/:id', async () => {
-    (userService.readUserById as any).mockResolvedValue([data]);
-    await request(app)
-      .get('/user/12345')
-      .expect('Content-Type', /json/)
-      .expect(200,[data])
+  test('GET /group/:id', async () => {
+    (groupService.readGroupById as any).mockResolvedValue([data]);
+    await request(app).get('/group/12345').expect('Content-Type', /json/).expect(200, [data]);
   });
 
-  test('GET /user/:id user not found', async () => {
-    (userService.readUserById as any).mockResolvedValue(null);
+  test('GET /group/:id group not found', async () => {
+    (groupService.readGroupById as any).mockResolvedValue(null);
     await request(app)
-      .get('/user/11111')
+      .get('/group/11111')
       .expect('Content-Type', /json/)
-      .expect(404, '"User not found"')
+      .expect(404, '"Group not found"');
   });
 
-  test('POST /user',  async () => {
-    const newUser = {
-      login: 'newusername1',
-      password: 'Password 12345',
-      age: 55
+  test('POST /group', async () => {
+    const newGroup = {
+      name: 'TESTER',
+      permissions: ['READ', 'UPLOAD_FILES'],
     };
-    (userService.create as any).mockResolvedValue(newUser);
-     await request(app)
-      .post('/user')
-       .send(newUser)
-       .set('Accept', 'application/json')
-       .expect('Content-Type', /json/)
-      .expect(201, newUser);
-  });
 
-  test('PUT /user/:id',  async () => {
-    const updatedUser = {
-      id: '12345',
-      login: 'username2',
-      password: 'PASSword 2',
-      age: 55,
-      isDeleted: false
-    };
-    (userService.update as any).mockResolvedValue(updatedUser);
+    (groupService.create as any).mockResolvedValue(newGroup);
     await request(app)
-      .put('/user/12345')
-      .send(updatedUser)
+      .post('/group')
+      .send(newGroup)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
-      .expect(200, updatedUser);
+      .expect(201, newGroup);
   });
 
-  test('DELETE /user/:id', async()  => {
-    (userService.delete as any).mockResolvedValue(data);
+  test('PUT /group/:id', async () => {
+    const updatedGroup = {
+      name: 'POWERTESTER',
+      permissions: ['READ', 'UPLOAD_FILES', 'WRITE'],
+    };
+
+    (groupService.update as any).mockResolvedValue(updatedGroup);
     await request(app)
-      .delete('/user/123')
-      .expect(200)
+      .put('/group/12345')
+      .send(updatedGroup)
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200, updatedGroup);
+  });
+
+  test('DELETE /group/:id', async () => {
+    (groupService.delete as any).mockResolvedValue(data);
+    await request(app).delete('/group/123').expect(200);
   });
 });
